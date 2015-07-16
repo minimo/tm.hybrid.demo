@@ -21,15 +21,17 @@ tm.define("KiraraOnStage", {
         this.camera.lookAt(new THREE.Vector3(0, 10, 0));
         
         // ライトを動かす
+        this.directionalLight.setPosition(0, 100, -80);
+/*
         this.directionalLight
             .on("enterframe", function(e) {
                 var f = e.app.frame;
                 this.x = Math.cos(f * 0.1) * 10;
                 this.z = Math.sin(f * 0.1) * 10;
             });
-
+*/
         var sx = 20, sy = 20;
-        var texture = THREE.ImageUtils.loadTexture('assets/texture.jpg');
+        var texture = THREE.ImageUtils.loadTexture('assets/tmlib_logo.png');
         var geometry = new THREE.PlaneGeometry(1000, 1000, sx, sy);
         var material = new THREE.MeshLambertMaterial({map: texture, side: THREE.DoubleSide});
         this.planeMesh = new THREE.Mesh(geometry, material);
