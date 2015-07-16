@@ -78,13 +78,10 @@ tm.define("KiraraOnStage", {
         var sx = this.planeMesh.sx, sy = this.planeMesh.sy;
         for (var x = 0; x < sx+1; x++) {
             for (var y = 0; y < sy+1; y++) {
-                //(x,y)のvertexを得る
                 var index = y*(sx+1)+x%(sy+1);
                 var vertex = this.planeMesh.geometry.vertices[index];
-
-                //時間経過と頂点の位置によって波を作る
-                var amp = 20;//振幅
-                vertex.z = amp*Math.sin(-x/2 + time*120);
+                var amp = 50+500*noise.perlin3(x+time, y+time, time);
+                vertex.z = amp*Math.sin(-x/2 + time/5);
             }
         }
     },
