@@ -28,13 +28,11 @@ tm.define("KiraraOnStage", {
                 this.z = Math.sin(f * 0.1) * 10;
             });
 
-        // Verttex texture test
-        var sx = 100, sy = 100;
+        var sx = 50, sy = 50;
         var texture = THREE.ImageUtils.loadTexture('assets/texture.jpg');
         var geometry = new THREE.PlaneGeometry(1000, 1000, sx, sy);
-        var material = new THREE.MeshLambertMaterial({map: texture});
+        var material = new THREE.MeshLambertMaterial({map: texture, side: THREE.DoubleSide});
         this.planeMesh = new THREE.Mesh(geometry, material);
-        this.planeMesh.geometry.verticesNeedUpdate = true;
 
         // メッシュを表示する
         var kirara = tm.hybrid.Mesh(this.planeMesh)
@@ -73,15 +71,18 @@ tm.define("KiraraOnStage", {
     },
     update: function(e) {
         var time = this.time++;
-        var sx = 100, sy = 100;
+
+        this.planeMesh.geometry.verticesNeedUpdate = true;
+        var sx = 50, sy = 50;
         for (var x = 0; x < sx+1; x++) {
             for (var y = 0; y < sy+1; y++) {
                 //(x,y)のvertexを得る
                 var index = y*(sx+1)+x%(sy+1);
                 var vertex = this.planeMesh.geometry.vertices[index];
+
                 //時間経過と頂点の位置によって波を作る
-                var amp = 100;//振幅
-                vertex.z = amp*Math.sin(-x/2 + time*15);
+                var amp = 20;//振幅
+                vertex.z = amp*Math.sin(-x/2 + time*120);
             }
         }
     },
