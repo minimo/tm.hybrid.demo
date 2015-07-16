@@ -28,11 +28,13 @@ tm.define("KiraraOnStage", {
                 this.z = Math.sin(f * 0.1) * 10;
             });
 
-        var sx = 50, sy = 50;
+        var sx = 20, sy = 20;
         var texture = THREE.ImageUtils.loadTexture('assets/texture.jpg');
         var geometry = new THREE.PlaneGeometry(1000, 1000, sx, sy);
         var material = new THREE.MeshLambertMaterial({map: texture, side: THREE.DoubleSide});
         this.planeMesh = new THREE.Mesh(geometry, material);
+        this.planeMesh.sx = sx;
+        this.planeMesh.sy = sy;
 
         // メッシュを表示する
         var kirara = tm.hybrid.Mesh(this.planeMesh)
@@ -73,7 +75,7 @@ tm.define("KiraraOnStage", {
         var time = this.time++;
 
         this.planeMesh.geometry.verticesNeedUpdate = true;
-        var sx = 50, sy = 50;
+        var sx = this.planeMesh.sx, sy = this.planeMesh.sy;
         for (var x = 0; x < sx+1; x++) {
             for (var y = 0; y < sy+1; y++) {
                 //(x,y)のvertexを得る
