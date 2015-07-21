@@ -30,13 +30,25 @@ tm.define("KiraraOnStage", {
                 this.z = Math.sin(f * 0.1) * 10;
             });
 */
+
         var sx = 20, sy = 20;
         var texture = THREE.ImageUtils.loadTexture('assets/tmlib_logo.png');
         var geometry = new THREE.PlaneGeometry(1000, 1000, sx, sy);
-        var material = new THREE.MeshLambertMaterial({map: texture, side: THREE.DoubleSide});
+
+        this.shaderUniforms = {
+            curlR: {type: 'f', value: 0.0},
+            texture: {type: 't', value: texture},
+        }
+        var material = new THREE.ShaderMaterial({
+                vertexShader: document.getElementById('vertexShader').textContent,
+                fragmentShader: document.getElementById('fragmentShader').textContent,
+                uniforms: this.shaderUniforms,
+            });
+        material.side = THREE.DoubleSide;
+        material.transparent = true;
+        material.blending = THREE.NormalBlending;
+
         this.planeMesh = new THREE.Mesh(geometry, material);
-        this.planeMesh.sx = sx;
-        this.planeMesh.sy = sy;
 
         // メッシュを表示する
         var kirara = tm.hybrid.Mesh(this.planeMesh)
@@ -75,16 +87,7 @@ tm.define("KiraraOnStage", {
     },
     update: function(e) {
         var time = this.time++;
-
-        this.planeMesh.geometry.verticesNeedUpdate = true;
-        var sx = this.planeMesh.sx, sy = this.planeMesh.sy;
-        for (var x = 0; x < sx+1; x++) {
-            for (var y = 0; y < sy+1; y++) {
-                var index = y*(sx+1)+x%(sy+1);
-                var vertex = this.planeMesh.geometry.vertices[index];
-                var amp = 50+500*noise.perlin3(x+time, y+time, time);
-                vertex.z = amp*Math.sin(-x/2 + time/5);
-            }
-        }
+        var _curlR = 300.0 + 150.0 * Math.sin(time*0.1);
+        this.shaderUniforms.curlR.value = _curlR;
     },
 });

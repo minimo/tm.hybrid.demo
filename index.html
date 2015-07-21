@@ -16,12 +16,20 @@
 <script src="tm.mqo.js"></script>
 <script src="main.js"></script>
 
-<script id="vertexShaderSimple" type="x-shader/x-vertex">
-    varying vec2 vUv;   // fragmentShaderに渡すためのvarying変数
+<script id="vertexShader" type="x-shader/x-vertex">
+    varying vec2 vUv;
+    uniform float curlR;
     void main() {
-        vUv = uv;   // 処理する頂点ごとのuv(テクスチャ)座標をそのままfragmentShaderに横流しする
-        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);    // 変換：ローカル座標 → 配置 → カメラ座標
-        gl_Position = projectionMatrix * mvPosition;                // 変換：カメラ座標 → 画面座標
+        vUv = uv;
+
+        float theta = position.x / curlR;
+        float tx = curlR * sin(theta);
+        float ty = position.y;
+        float tz = curlR * (1.0 - cos(theta));
+        vec3 p = vec3(tx, ty, tz);
+
+        vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
+        gl_Position = projectionMatrix * mvPosition;
     }
 </script>
 
