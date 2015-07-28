@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+    
+<canvas id="canvas3d"></canvas>
+<canvas id="canvas2d"></canvas>
+
+<script src="https://cdn.rawgit.com/phi-jp/tmlib.js/0.5.2/build/tmlib.js"></script>
+<script src="https://cdn.rawgit.com/mrdoob/three.js/r71/build/three.js"></script>
+
+<script src="libs/tm.hybrid.js"></script>
+<script>
+tm.main(function() {
+    var app = tm.hybrid.Application("#canvas2d", "#canvas3d");
+    app.resize(640, 960).fitWindow().run();
+    
+    app.replaceScene(tm.game.LoadingScene({
+        width: 640, height: 960,
+        assets: {
+            // もとがし氏作成のモデルデータを使用しています
+            gradriel: "assets/gradriel_pose.mqo",
+        },
+        nextScene: mainScene,
+    }));
+});
+
+tm.define("mainScene", {
+    superClass: "tm.hybrid.Scene",
+
+    init: function() {
+        this.superInit();
+
+        // カメラ調整
+        this.camera.setPosition(0, 30, 80);
+        this.camera.lookAt(new THREE.Vector3(0, 10, 0));
+        
+        // ライトを動かす
+        this.directionalLight
+            .on("enterframe", function(e) {
+                var f = e.app.frame;
+                this.x = Math.cos(f * 0.1) * 10;
+                this.z = Math.sin(f * 0.1) * 10;
+            });
+
+        // 説明表示
+        var lb = tm.display.Label("３Ｄオブジェクトがタッチで反応するよ！")
+            .addChildTo(this)
+            .setPosition(320, 20);
+
+        // メッシュを表示する
+        this.meshes = [];
+        for (var i = 0; i < 50; i+=10) {
+            var mesh = this.meshes[i] = tm.hybrid.Mesh("gradriel");
+            mesh.vy = 0;
+            mesh.addChildTo(this)
+                .setPosition(i-30, 0, i-30) 
+                .on("enterframe", function(e) {
+                    this.rotation.y += this.vy;
+                    this.vy *= 0.98;
+                    if (this.vy < 0.01) this.vy = 0;
+                }.bind(mesh));
+            mesh.threeObject.hybridObject = mesh;
+        }
+    },
+
+    update: function(e) {
+        var p = e.pointing;
+        if (p.getPointing()) {
+            // Get Camera & scene object
+            var camera = this.camera.threeObject;
+            var scene = this.three.threeObject;
+
+            // touch screen position normalize -1 to 1
+            var mx =  (p.x/640)*2-1;
+            var my = -(p.y/960)*2+1;
+            var pos = new THREE.Vector3(mx, my, 1);
+            pos.unproject(camera);
+
+            // Create RayCaster
+            var ray = new THREE.Raycaster(camera.position, pos.sub(camera.position).normalize());
+
+            // Intersect object
+            var obj = ray.intersectObjects(scene.children);
+
+            if (obj.length > 0) {
+                obj[0].object.hybridObject.vy = 1;
+            }
+        }
+    },
+});
+</script>
+
+</body>
+</html>
